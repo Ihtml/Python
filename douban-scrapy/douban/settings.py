@@ -55,8 +55,12 @@ HTTPERROR_ALLOWED_CODES = [301]
 
 # Enable or disable downloader middlewares
 # See https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
+
+# 优先级号越小代表优先级越高
 DOWNLOADER_MIDDLEWARES = {
-   'douban.middlewares.DoubanDownloaderMiddleware': 543,
+#    'douban.middlewares.DoubanDownloaderMiddleware': 543,
+    # 'douban.middlewares.ProxyMiddleware': 543,
+    'douban.middlewares.my_useragent': 542,
 }
 
 # Enable or disable extensions
