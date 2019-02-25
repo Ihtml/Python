@@ -22,4 +22,9 @@ class DoubanSpiderSpider(scrapy.Spider):
             for i_content in content:
                 content_s = "".join(i_content.split())
                 douban_item['introduce'] = content_s
-            print(douban_item)
+            # print(douban_item)
+            douban_item['star'] = i_item.xpath(".//span[@class='rating_num']/text()").extract_first()
+            douban_item['evaluate'] = i_item.xpath(".//div[@class='star']//span[4]/text()").extract_first()
+            douban_item['describe'] = i_item.xpath(".//p[@class='quote']/span/text()").extract_first()
+            # yield到管道，使管道接受数据
+            yield douban_item
