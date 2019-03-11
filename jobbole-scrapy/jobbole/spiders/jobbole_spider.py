@@ -5,6 +5,7 @@ import datetime
 from scrapy.http import Request
 from urllib import parse
 from jobbole.items import JobboleItem
+from jobbole.utils.common import get_md5
 
 
 class JobboleSpiderSpider(scrapy.Spider):
@@ -77,6 +78,7 @@ class JobboleSpiderSpider(scrapy.Spider):
         tag_list = [element for element in tag_list if not element.strip().endswith("评论")]
         tags = ",".join(tag_list)
 
+        article_item["url_object_id"] = get_md5(response.url)
         article_item['title'] = title
         article_item['url'] = response.url
         article_item['create_date'] = create_date
