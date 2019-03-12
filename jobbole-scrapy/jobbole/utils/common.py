@@ -10,6 +10,7 @@ def get_md5(url):
         url = url.encode("utf-8")
     m = hashlib.md5()
     m.update(url)
+    # 返回十六进制数据字符串值
     return m.hexdigest()
 
 
