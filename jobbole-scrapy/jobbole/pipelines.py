@@ -11,6 +11,8 @@ import os
 from scrapy.pipelines.images import ImagesPipeline
 from scrapy.exporters import JsonItemExporter
 
+import MySQLdb
+import MySQLdb.cursors
 
 class JobbolePipeline(object):
     def process_item(self, item, spider):
@@ -59,4 +61,16 @@ class JsonExporterPipleline(object):
         self.exporter.finish_exporting()
         self.file.close()
 
+class MysqlPipeline(object):
+    #采用同步的机制写入mysql
+    def __init__(self):
+        self.conn = MySQLdb.connect('localhost', 'root', '***', 'article_spider', charset="utf8", use_unicode=True)
+        self.cursor = self.conn.cursor()
 
+    def process_item(self, item, spider):
+        insert_sql = """
+            insert into jobbole_article(title, url, create_date, fav_nums)
+            VALUES (%s, %s, %s, %s)
+        """
+        self.cursor.execute(insert_sql, (item["title"], item["url"], item["create_date"], item["fav_nums"]))
+        self.conn.commit()
