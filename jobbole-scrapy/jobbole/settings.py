@@ -67,8 +67,11 @@ ROBOTSTXT_OBEY = False
 ITEM_PIPELINES = {
     'jobbole.pipelines.JobbolePipeline': 300,
     # 'scrapy.pipelines.images.ImagesPipeline': 1,
-    'jobbole.pipelines.JsonExporterPipleline': 2,
-    'jobbole.pipelines.ArticleImagePipeline': 1,  # 自定义图片的pipeline
+    # 'jobbole.pipelines.JsonExporterPipleline': 2,
+    # 'jobbole.pipelines.ArticleImagePipeline': 1,  # 自定义图片的pipeline
+    # 'jobbole.pipelines.MysqlPipeline': 1,
+    'jobbole.pipelines.MysqlTwistedPipline': 1,
+
 }
 IMAGES_URLS_FIELD = 'front_image_url'
 project_dir = os.path.abspath(os.path.dirname(__file__))
@@ -97,3 +100,8 @@ IMAGES_MIN_WIDTH = 100
 # HTTPCACHE_DIR = 'httpcache'
 # HTTPCACHE_IGNORE_HTTP_CODES = []
 # HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
+
+MYSQL_HOST = "127.0.0.1"
+MYSQL_DBNAME = "article_spider"
+MYSQL_USER = "root"
+MYSQL_PASSWORD = "usemysql"
