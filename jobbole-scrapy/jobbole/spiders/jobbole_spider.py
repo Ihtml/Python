@@ -4,6 +4,8 @@ import re
 import datetime
 from scrapy.http import Request
 from urllib import parse
+from scrapy.loader import ItemLoader
+
 from jobbole.items import JobboleItem
 from jobbole.utils.common import get_md5
 
@@ -94,5 +96,20 @@ class JobboleSpiderSpider(scrapy.Spider):
         article_item['tags'] = tags
         article_item['content'] = content
         print(article_item)
+
+        # 通过item loader加载item
+        item_loader = ItemLoader(item=JobboleItem(), response=response)
+        item_loader.add_css("title", ".entry-header h1::text")
+        item_loader.add_value("url", response.url)
+        item_loader.add_value("url_object_id", get_md5(response.url))
+        item_loader.add_css("create_date", "p.entry-meta-hide-on-mobile::text")
+        item_loader.add_value("front_image_url", [front_image_url])
+        item_loader.add_css("praise_nums", ".vote-post-up h10::text")
+        item_loader.add_css("comment_nums", "a[href='#article-comment'] span::text")
+        item_loader.add_css("fav_nums", ".bookmark-btn::text")
+        item_loader.add_css("tags", "p.entry-meta-hide-on-mobile a::text")
+        item_loader.add_css("content", "div.entry")
+
+        article_item = item_loader.load_item()
 
         yield article_item
