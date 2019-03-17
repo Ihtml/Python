@@ -12,6 +12,12 @@ class ZhihuSpiderSpider(scrapy.Spider):
     allowed_domains = ['www.zhihu.com']
     start_urls = ['https://www.zhihu.com/']
 
+    headers = {
+        "HOST": "www.zhihu.com",
+        "Referer": "https://www.zhihu.com",
+        "User-Agent": 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.121 Safari/537.36'
+    }
+
     def start_requests(self):
         import pickle
         cookies = pickle.load(open("/Users/github/Python/zhihu-spider/cookies/zhihu_cookie", "rb"))
