@@ -39,6 +39,8 @@ class ZhihuSpiderSpider(scrapy.Spider):
             pass
 
         browser.get("https://www.zhihu.com/signin")
+        browser_navigation_panel_height = 71
+        
         browser.find_element_by_css_selector(".SignFlow-accountInput.Input-wrapper input").send_keys(Keys.CONTROL, "a")
         browser.find_element_by_css_selector(".SignFlow-accountInput.Input-wrapper input").send_keys(
             "18612345678")
@@ -71,7 +73,70 @@ class ZhihuSpiderSpider(scrapy.Spider):
             except:
                 chinese_captcha_element = None
 
+            if chinese_captcha_element:
+                y_relative_coord = chinese_captcha_element.location['y']
+                y_absolute_coord = y_relative_coord + browser_navigation_panel_height
+                x_absolute_coord = chinese_captcha_element.location['x']
+                # x_absolute_coord = 842
+                # y_absolute_coord = 428
 
+                """
+                保存图片
+                1. 通过保存base64编码
+                2. 通过crop方法
+                """
+                # 1. 通过保存base64编码
+                base64_text = chinese_captcha_element.get_attribute("src")
+                import base64
+                code = base64_text.replace('data:image/jpg;base64,', '').replace("%0A", "")
+                # print code
+                fh = open("yzm_cn.jpeg", "wb")
+                fh.write(base64.b64decode(code))
+                fh.close()
+
+                from zheye import zheye
+                z = zheye()
+                positions = z.Recognize("yzm_cn.jpeg")
+
+                pos_arr = []
+                if len(positions) == 2:
+                    if positions[0][1] > positions[1][1]:
+                        pos_arr.append([positions[1][1], positions[1][0]])
+                        pos_arr.append([positions[0][1], positions[0][0]])
+                    else:
+                        pos_arr.append([positions[0][1], positions[0][0]])
+                        pos_arr.append([positions[1][1], positions[1][0]])
+                else:
+                    pos_arr.append([positions[0][1], positions[0][0]])
+
+                if len(positions) == 2:
+                    first_point = [int(pos_arr[0][0] / 2), int(pos_arr[0][1] / 2)]
+                    second_point = [int(pos_arr[1][0] / 2), int(pos_arr[1][1] / 2)]
+
+                    move((x_absolute_coord + first_point[0]), y_absolute_coord + first_point[1])
+                    click()
+
+                    move((x_absolute_coord + second_point[0]), y_absolute_coord + second_point[1])
+                    click()
+
+                else:
+                    first_point = [int(pos_arr[0][0] / 2), int(pos_arr[0][1] / 2)]
+
+                    move((x_absolute_coord + first_point[0]), y_absolute_coord + first_point[1])
+                    click()
+
+                browser.find_element_by_css_selector(".SignFlow-accountInput.Input-wrapper input").send_keys(
+                    Keys.CONTROL + "a")
+                browser.find_element_by_css_selector(".SignFlow-accountInput.Input-wrapper input").send_keys(
+                    "xxx")
+
+                browser.find_element_by_css_selector(".SignFlow-password input").send_keys(Keys.CONTROL + "a")
+                browser.find_element_by_css_selector(".SignFlow-password input").send_keys(
+                    "xxx")
+                browser.find_element_by_css_selector(
+                    ".Button.SignFlow-submitButton").click()
+                browser.find_element_by_css_selector(
+                    ".Button.SignFlow-submitButton").click()
 
 # def start_requests(self):
 #     import pickle
