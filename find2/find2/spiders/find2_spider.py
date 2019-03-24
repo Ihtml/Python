@@ -59,7 +59,7 @@ class Find2SpiderSpider(scrapy.Spider):
                     prices = browser.find_elements_by_css_selector("#condition-all .field.price-field")
                     names = browser.find_elements_by_css_selector("#condition-all .field.seller-name span a")
                 except Exception as e:
-                    b[i] = 0
+                    b[i] = '0'
                     d[i] = 'dontknow'
                     modifiy_list.append(i+1)
                     continue
@@ -90,7 +90,7 @@ class Find2SpiderSpider(scrapy.Spider):
                     print('the new price is ****** ctss1897 ******: =====', want_price)
                     b[i] = want_price
                     d[i] = 'ctss1897'
-                    modifiy_list.append(i+1)
+                    modifiy_list.append(int(i)+1)
                     print("==================end=======================")
                     continue
 
@@ -103,7 +103,7 @@ class Find2SpiderSpider(scrapy.Spider):
                     print('the new price is ****** seventeeeeeeen ******: =====', want_price)
                     b[i] = want_price
                     d[i] = 'seventeeeeeeen'
-                    modifiy_list.append(i+1)
+                    modifiy_list.append(int(i)+1)
                     print("==================end=======================")
                     continue
                 except Exception as e:
@@ -135,7 +135,7 @@ class Find2SpiderSpider(scrapy.Spider):
 
         with open('changedline.txt', 'w') as f:
             for item in modifiy_list:
-                f.write(item + '\n')
+                f.write(str(item) + '\n')
         f.close()
 
         # for item in a:
