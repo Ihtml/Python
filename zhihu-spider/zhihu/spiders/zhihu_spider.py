@@ -8,6 +8,7 @@ from selenium.webdriver.common.keys import Keys
 
 
 # from mouse import move, click
+import pyautogui
 
 
 class ZhihuSpiderSpider(scrapy.Spider):
@@ -39,7 +40,10 @@ class ZhihuSpiderSpider(scrapy.Spider):
             pass
 
         browser.get("https://www.zhihu.com/signin")
-        browser_navigation_panel_height = 71
+
+        # 浏览器执行js代码获取浏览器工具栏高度
+        browser_navigation_panel_height = browser.execute_script('return window.outerHeight - window.innerHeight;')
+        # browser_navigation_panel_height = 71
         
         browser.find_element_by_css_selector(".SignFlow-accountInput.Input-wrapper input").send_keys(Keys.CONTROL, "a")
         browser.find_element_by_css_selector(".SignFlow-accountInput.Input-wrapper input").send_keys(
@@ -51,7 +55,7 @@ class ZhihuSpiderSpider(scrapy.Spider):
             ".Button.SignFlow-submitButton").click()
 
         # 等待加载完成
-        time.sleep(10)
+        time.sleep(5)
         # 判断是否登录成功
         login_success = False
         while not login_success:
@@ -110,21 +114,27 @@ class ZhihuSpiderSpider(scrapy.Spider):
                     pos_arr.append([positions[0][1], positions[0][0]])
 
                 if len(positions) == 2:
+                    # 保存到本地的图片长宽是原图的两倍
                     first_point = [int(pos_arr[0][0] / 2), int(pos_arr[0][1] / 2)]
                     second_point = [int(pos_arr[1][0] / 2), int(pos_arr[1][1] / 2)]
 
-                    move((x_absolute_coord + first_point[0]), y_absolute_coord + first_point[1])
-                    click()
-
-                    move((x_absolute_coord + second_point[0]), y_absolute_coord + second_point[1])
-                    click()
+                    # move((x_absolute_coord + first_point[0]), y_absolute_coord + first_point[1])
+                    # click()
+                    #
+                    # move((x_absolute_coord + second_point[0]), y_absolute_coord + second_point[1])
+                    # click()
+                    pyautogui.moveTo((x_absolute_coord + first_point[0]), y_absolute_coord + first_point[1])
+                    pyautogui.click()
 
                 else:
                     first_point = [int(pos_arr[0][0] / 2), int(pos_arr[0][1] / 2)]
 
-                    move((x_absolute_coord + first_point[0]), y_absolute_coord + first_point[1])
-                    click()
+                    # move((x_absolute_coord + first_point[0]), y_absolute_coord + first_point[1])
+                    # click()
+                    pyautogui.moveTo((x_absolute_coord + first_point[0]), y_absolute_coord + first_point[1])
+                    pyautogui.click()
 
+                # 输入验证码后重新登录
                 browser.find_element_by_css_selector(".SignFlow-accountInput.Input-wrapper input").send_keys(
                     Keys.CONTROL + "a")
                 browser.find_element_by_css_selector(".SignFlow-accountInput.Input-wrapper input").send_keys(
