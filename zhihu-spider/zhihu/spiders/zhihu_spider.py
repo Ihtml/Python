@@ -3,9 +3,15 @@ import scrapy
 import time
 import re
 
+try:
+    import urlparse as parse
+except:
+    from urllib import parse
+
+from scrapy.loader import ItemLoader
+from zhihu.items import ZhihuQuestionItem, ZhihuAnswerItem
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-
 
 # from mouse import move, click
 import pyautogui
@@ -44,7 +50,7 @@ class ZhihuSpiderSpider(scrapy.Spider):
         # 浏览器执行js代码获取浏览器工具栏高度
         browser_navigation_panel_height = browser.execute_script('return window.outerHeight - window.innerHeight;')
         # browser_navigation_panel_height = 71
-        
+
         browser.find_element_by_css_selector(".SignFlow-accountInput.Input-wrapper input").send_keys(Keys.CONTROL, "a")
         browser.find_element_by_css_selector(".SignFlow-accountInput.Input-wrapper input").send_keys(
             "18612345678")
@@ -148,6 +154,7 @@ class ZhihuSpiderSpider(scrapy.Spider):
                 browser.find_element_by_css_selector(
                     ".Button.SignFlow-submitButton").click()
 
+
 # def start_requests(self):
 #     import pickle
 #     # 将文件中的cookie数据解析为一个Python对象
@@ -216,3 +223,27 @@ def parse(self, response):
         else:
             # 如果不是question页面则直接进一步跟踪
             yield scrapy.Request(url, headers=self.headers, callback=self.parse)
+
+
+def parse_question(self, response):
+    # 处理question页面， 从页面中提取出具体的question item
+    if "QuestionHeader-title" in response.text:
+        match_obj = re.match("(.*zhihu.com/question/(\d+))(/|$).*", response.url)
+        if match_obj:
+            question_id = int(match_obj.group(2))
+
+        item_loader = ItemLoader(item=ZhihuQuestionItem(), response=response)
+        item_loader.add_css("title", "h1.QuestionHeader-title::text")
+        item_loader.add_css("content", ".QuestionHeader-detail")
+        item_loader.add_value("url", response.url)
+        item_loader.add_value("zhihu_id", question_id)
+        item_loader.add_css("answer_num", ".List-headerText span::text")
+        item_loader.add_css("comments_num", ".QuestionHeader-actions button::text")
+        item_loader.add_css("watch_user_num", ".NumberBoard-value::text")
+        item_loader.add_css("topics", ".QuestionHeader-topics .Popover div::text")
+
+        question_item = item_loader.load_item()
+
+    yield scrapy.Request(self.start_answer_url.format(question_id, 20, 0), headers=self.headers,
+                         callback=self.parse_answer)
+    yield question_item
