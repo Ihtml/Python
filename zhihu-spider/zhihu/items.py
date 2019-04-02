@@ -9,6 +9,8 @@ import scrapy
 import datetime
 import re
 
+from zhihu.settings import SQL_DATETIME_FORMAT, SQL_DATE_FORMAT
+
 
 def extract_num(text):
     # 从字符串中提取出数字
